@@ -3,9 +3,11 @@ package com.amarjot8.assignment8;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 
 public class Gameplay extends AppCompatActivity {
@@ -41,12 +43,13 @@ public class Gameplay extends AppCompatActivity {
 
     public class DrawingView extends View
     {
-        protected int Ballx = 100;
-        protected int Bally = 100;
+        protected int Ballx, Bally;
         protected int Ballradius = 50;
 
-        public DrawingView(Context context) {
+        public DrawingView(Context context)
+        {
             super(context);
+            setBallxy();
         }
 
         @Override
@@ -54,6 +57,15 @@ public class Gameplay extends AppCompatActivity {
         {
             DrawBall(c,Ballx,Bally,Ballradius);
             invalidate();
+        }
+
+        protected void setBallxy()
+        {
+            Display display = getWindowManager().getDefaultDisplay();
+            Point dimensions = new Point();
+            display.getSize(dimensions);
+            Ballx = dimensions.x - (dimensions.x /2);
+            Bally = dimensions.y - (dimensions.x /4);
         }
     }
 
