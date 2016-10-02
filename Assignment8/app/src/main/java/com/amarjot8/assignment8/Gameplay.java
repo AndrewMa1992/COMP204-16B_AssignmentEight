@@ -14,16 +14,19 @@ public class Gameplay extends AppCompatActivity {
     @Override
     protected void onStop()
     {
+        super.onStop();
         printToLog("onStop : ", "onStop");
     }
     @Override
     protected void onPause()
     {
+        super.onPause();
         printToLog("LifeCycle : ", "onPause");
     }
     @Override
     protected void onResume()
     {
+        super.onResume();
         printToLog("LifeCycle : ", "onResume");
     }
     @Override
@@ -38,8 +41,19 @@ public class Gameplay extends AppCompatActivity {
 
     public class DrawingView extends View
     {
+        protected int Ballx = 100;
+        protected int Bally = 100;
+        protected int Ballradius = 50;
+
         public DrawingView(Context context) {
             super(context);
+        }
+
+        @Override
+        protected void onDraw(Canvas c)
+        {
+            DrawBall(c,Ballx,Bally,Ballradius);
+            invalidate();
         }
     }
 
