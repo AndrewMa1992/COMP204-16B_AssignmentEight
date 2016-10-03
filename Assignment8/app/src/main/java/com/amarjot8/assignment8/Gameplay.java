@@ -5,11 +5,20 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Rect;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Random;
 
 public class Gameplay extends AppCompatActivity {
 
@@ -47,17 +56,35 @@ public class Gameplay extends AppCompatActivity {
         protected int Ball_x, Ball_y;
         protected int Ballradius = 100;
 
+
+        protected final static int numCans=5;
+        protected List<Can> Cans=new ArrayList<>();
+
         public DrawingView(Context context)
         {
             super(context);
             setBallxy();
         }
 
+
         @Override
         protected void onDraw(Canvas c)
         {
             controlBallxy(c);
             DrawBall(c,Ball_x,Ball_y,Ballradius);
+            //multiple methods will need a Paint object; might as well put it here.
+            Paint p = new Paint();
+
+            DrawBall(c,Ball_x,Ball_y,Ballradius);
+
+            //populate the list and draw all cans
+            if (Cans.isEmpty()){
+                for (int i=0; i<numCans; i++)
+                    Cans.add(new Can(c));
+            }
+            for (Can can:Cans){
+                can.Draw(c,p);
+            }
             invalidate();
         }
 
@@ -88,6 +115,37 @@ public class Gameplay extends AppCompatActivity {
             display.getSize(dimensions);
             Ball_x = dimensions.x - (dimensions.x /2);
             Ball_y = dimensions.y - (dimensions.x /4);
+        }
+    }
+
+    /**
+     * class for can object. Contains all relevent methods and variables
+     */
+    public class Can{
+        private static final int width=100;
+        private static final int height=300;
+        private int x;
+        private int y;
+
+        /**
+         * picks random x and y coordinates
+         * @param c
+         */
+        Can(Canvas c){
+            Random rand=new Random();
+
+            x=rand.nextInt(c.getWidth()-width);
+            //added extra brackets in case BEDMAS is not followed
+            y=rand.nextInt((c.getHeight()/3)-height);
+        }
+
+        /**
+         * draws the can
+         * @param c
+         * @param p
+         */
+        public void Draw(Canvas c, Paint p){
+            c.drawRect(x, y, x+width, y+height, p);
         }
     }
 
