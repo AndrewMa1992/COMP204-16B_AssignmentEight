@@ -24,13 +24,30 @@ public class Home extends AppCompatActivity {
             }
         });
 
+        //Storing Exit button
+        Button b_Exit = (Button) findViewById(R.id.exitbutton);
+        b_Exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                exitapp();
+            }
+        });
     }
 
-
+    //Launchs Game Activity
     private void launchGameactivity()
     {
         //Launching Gameplay Acitvity
         Intent intent = new Intent(this, Gameplay.class);
+        startActivity(intent);
+    }
+    //Exits App and returns user to device Home Screen
+    private void exitapp()
+    {
+        //Going to Home Screen
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
 }
