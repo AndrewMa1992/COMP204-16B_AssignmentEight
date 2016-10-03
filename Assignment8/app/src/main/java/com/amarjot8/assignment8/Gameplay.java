@@ -2,6 +2,7 @@ package com.amarjot8.assignment8;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.support.v7.app.AppCompatActivity;
@@ -43,8 +44,8 @@ public class Gameplay extends AppCompatActivity {
 
     public class DrawingView extends View
     {
-        protected int Ballx, Bally;
-        protected int Ballradius = 50;
+        protected int Ball_x, Ball_y;
+        protected int Ballradius = 100;
 
         public DrawingView(Context context)
         {
@@ -55,17 +56,38 @@ public class Gameplay extends AppCompatActivity {
         @Override
         protected void onDraw(Canvas c)
         {
-            DrawBall(c,Ballx,Bally,Ballradius);
+            controlBallxy(c);
+            DrawBall(c,Ball_x,Ball_y,Ballradius);
             invalidate();
         }
 
+        //Makes sure ball cannot go out of screen except from top
+        protected void controlBallxy(Canvas c)
+        {
+            //Stop it from left
+            if(Ball_x - Ballradius < 0 )
+            {
+                Ball_x = 0 + Ballradius;
+            }
+            //Stop it from right
+            if(Ball_x + Ballradius > c.getWidth())
+            {
+                Ball_x = c.getWidth() - Ballradius;
+            }
+            //Stop it from bottom
+            if(Ball_y + Ballradius > c.getHeight())
+            {
+                Ball_y  = c.getHeight() - Ballradius;
+            }
+        }
+        //Sets the ball on bottom center of phone
         protected void setBallxy()
         {
             Display display = getWindowManager().getDefaultDisplay();
             Point dimensions = new Point();
             display.getSize(dimensions);
-            Ballx = dimensions.x - (dimensions.x /2);
-            Bally = dimensions.y - (dimensions.x /4);
+            Ball_x = dimensions.x - (dimensions.x /2);
+            Ball_y = dimensions.y - (dimensions.x /4);
         }
     }
 
@@ -76,7 +98,7 @@ public class Gameplay extends AppCompatActivity {
     protected void DrawBall(Canvas c, int x, int y, int radius)
     {
         Paint p = new Paint();
-
+        p.setColor(Color.BLUE);
         c.drawCircle(x,y,radius,p);
     }
 
@@ -86,6 +108,5 @@ public class Gameplay extends AppCompatActivity {
     private void printToLog(String tag, String msg)
     {
         Log.e(tag,msg);
-
     }
 }
