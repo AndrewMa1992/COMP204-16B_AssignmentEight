@@ -56,6 +56,7 @@ public class Gameplay extends AppCompatActivity {
 
         //Locking View in portait
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        
     }
 
 
