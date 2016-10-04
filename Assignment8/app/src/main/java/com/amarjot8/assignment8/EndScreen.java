@@ -28,6 +28,19 @@ public class EndScreen extends AppCompatActivity {
         // Display the score
         ((TextView)findViewById(R.id.textView_score)).setText(score + "");
 
+        // Find position on leaderboard and display it
+        if (score >= highScores[9]) {
+            for (int i = 0; i < 10; i++) {
+                if (score >= highScores[i]) {
+                    ((TextView)findViewById(R.id.textView_position)).setText(i + 1 + "");
+                    break;
+                }
+            }
+        } else {
+            // If the user doesn't make it onto the leaderboard display N/A
+            ((TextView)findViewById(R.id.textView_position)).setText("N/A");
+        }
+
 
 
         Button submitButton = (Button)findViewById(R.id.submitScoreButton);
