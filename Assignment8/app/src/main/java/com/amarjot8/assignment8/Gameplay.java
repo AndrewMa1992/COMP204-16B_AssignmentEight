@@ -1,6 +1,7 @@
 package com.amarjot8.assignment8;
 
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -42,7 +43,7 @@ public class Gameplay extends AppCompatActivity {
         super.onResume();
         printToLog("LifeCycle : ", "onResume");
     }
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -52,6 +53,9 @@ public class Gameplay extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         DrawingView dv = new DrawingView(this);
         setContentView(dv);
+
+        //Locking View in portait
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }
 
 

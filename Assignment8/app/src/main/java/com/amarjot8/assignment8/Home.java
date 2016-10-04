@@ -3,12 +3,9 @@ package com.amarjot8.assignment8;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-<<<<<<< HEAD
 import android.view.WindowManager;
-=======
 import android.view.View;
 import android.widget.Button;
->>>>>>> origin/master
 
 public class Home extends AppCompatActivity {
 
