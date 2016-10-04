@@ -56,10 +56,10 @@ public class Gameplay extends AppCompatActivity {
 
         //Locking View in portait
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        
+
     }
 
-
+    //Contains methods which Draws ball, Cans to screen
     public class DrawingView extends View
     {
         protected int Ball_x, Ball_y;
