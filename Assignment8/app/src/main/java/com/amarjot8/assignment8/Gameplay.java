@@ -1,12 +1,14 @@
 package com.amarjot8.assignment8;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -21,6 +23,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Gameplay extends AppCompatActivity {
 
@@ -59,30 +63,48 @@ public class Gameplay extends AppCompatActivity {
 
     }
 
+    protected void endGame(){
+        //Launching EndScreen Activity
+        Intent intent = new Intent(this, EndScreen.class);
+        startActivity(intent);
+    }
+
     //Contains methods which Draws ball, Cans to screen
     public class DrawingView extends View
     {
         protected int Ball_x, Ball_y;
         protected int Ballradius = 100;
 
+        protected long last_tick=-1,
+                timer=10000, tick_period=1000;
 
         protected final static int numCans=5;
         protected List<Can> Cans=new ArrayList<>();
 
-        public DrawingView(Context context)
+        public DrawingView(final Context context)
         {
             super(context);
             setBallxy();
+            last_tick=System.currentTimeMillis();
         }
-
 
         @Override
         protected void onDraw(Canvas c)
         {
+            //multiple methods will need a Paint object; might as well put it here.
+            final Paint p = new Paint();
+
+            //timer
+            if(System.currentTimeMillis()-last_tick>=tick_period){
+                if (timer<=0)
+                    endGame();
+                timer -= tick_period;
+                if(timer<0)timer=0;
+                last_tick=System.currentTimeMillis();
+            }
+
             controlBallxy(c);
             DrawBall(c,Ball_x,Ball_y,Ballradius);
-            //multiple methods will need a Paint object; might as well put it here.
-            Paint p = new Paint();
 
             DrawBall(c,Ball_x,Ball_y,Ballradius);
 
@@ -94,6 +116,12 @@ public class Gameplay extends AppCompatActivity {
             for (Can can:Cans){
                 can.Draw(c,p);
             }
+
+            //drawing timer last so its always on top layer
+            p.setColor(Color.RED);
+            p.setTextSize(200);
+            c.drawText(Long.toString(timer/1000), 10, 205, p);
+
             invalidate();
         }
 
@@ -157,7 +185,6 @@ public class Gameplay extends AppCompatActivity {
             c.drawRect(x, y, x+width, y+height, p);
         }
     }
-
 
 
 
