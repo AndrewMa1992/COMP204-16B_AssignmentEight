@@ -42,6 +42,7 @@ public class Gameplay extends AppCompatActivity {
         super.onResume();
         printToLog("LifeCycle : ", "onResume");
     }
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
