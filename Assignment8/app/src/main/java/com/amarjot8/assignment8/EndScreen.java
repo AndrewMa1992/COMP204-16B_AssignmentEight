@@ -1,5 +1,6 @@
 package com.amarjot8.assignment8;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -41,22 +42,35 @@ public class EndScreen extends AppCompatActivity {
             ((TextView)findViewById(R.id.textView_position)).setText("N/A");
         }
 
-
-
+        // When the submit button is pressed, submit the name and high score
         Button submitButton = (Button)findViewById(R.id.submitScoreButton);
         submitButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                //Open Game
                 SubmitHighScore();
+            }
+        });
+
+        // When the home button is pressed, return to the home activity
+        Button homeButton = (Button)findViewById(R.id.homeButton);
+        homeButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                startHomeActivity();
             }
         });
     }
 
     // Method to be called when the user presses the score submit button
-    public void SubmitHighScore() {
+    private void SubmitHighScore() {
         // For now, just show a toast with the entered name
         Toast toast = Toast.makeText(getApplicationContext(), ((EditText)findViewById(R.id.nameInput)).getText(), Toast.LENGTH_SHORT);
         toast.show();
+    }
+
+    // Return to the home activity
+    private void startHomeActivity() {
+        Intent intent = new Intent(this, Home.class);
+        startActivity(intent);
     }
 }
