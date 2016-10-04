@@ -42,7 +42,7 @@ public class Home extends AppCompatActivity {
     //Launchs Game Activity
     private void launchGameactivity()
     {
-        //Launching Gameplay Acitvity
+        //Launching Gameplay Activity
         Intent intent = new Intent(this, Gameplay.class);
         startActivity(intent);
     }
