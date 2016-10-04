@@ -75,7 +75,7 @@ public class Gameplay extends AppCompatActivity {
         protected int Ball_x, Ball_y;
         protected int Ballradius = 100;
 
-        protected long start_time, last_tick=-1,
+        protected long last_tick=-1,
                 timer=10000, tick_period=1000;
 
         protected final static int numCans=5;
@@ -85,7 +85,7 @@ public class Gameplay extends AppCompatActivity {
         {
             super(context);
             setBallxy();
-            start_time=System.currentTimeMillis();
+            last_tick=System.currentTimeMillis();
         }
 
         @Override
@@ -93,12 +93,14 @@ public class Gameplay extends AppCompatActivity {
         {
             //multiple methods will need a Paint object; might as well put it here.
             final Paint p = new Paint();
-            if(last_tick==-1||System.currentTimeMillis()-last_tick>=tick_period){
-                last_tick=System.currentTimeMillis();
-                if (timer==0)
+
+            //timer
+            if(System.currentTimeMillis()-last_tick>=tick_period){
+                if (timer<=0)
                     endGame();
-                else
-                    timer-=tick_period;
+                timer -= tick_period;
+                if(timer<0)timer=0;
+                last_tick=System.currentTimeMillis();
             }
 
             controlBallxy(c);
@@ -115,23 +117,10 @@ public class Gameplay extends AppCompatActivity {
                 can.Draw(c,p);
             }
 
-            /*
-            //can't place in constructor, as canvas is needed. Nested in an if statement instead.
-            if (timer==null){
-                //starts at 10,000ms, ticks every 1000ms
-                timer=new CountDownTimer(10000, 1000) {
-                    @Override
-                    public void onTick(long millisUntilFinished) {
-                        c.drawCircle(500, 500, 1000, p);
-                    }
-
-                    @Override
-                    public void onFinish() {
-                        endGame();
-                    }
-                }.start();
-            }
-            */
+            //drawing timer last so its always on top layer
+            p.setColor(Color.RED);
+            p.setTextSize(200);
+            c.drawText(Long.toString(timer/1000), 10, 205, p);
 
             invalidate();
         }
