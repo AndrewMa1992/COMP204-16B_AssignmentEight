@@ -136,8 +136,9 @@ public class Gameplay extends AppCompatActivity {
 
                         BallSpeedMotion_x =  (int)VelocityTrackerCompat.getXVelocity(mVelocityTracker, pointerId) /30;
                         BallSpeedMotion_y = (int)VelocityTrackerCompat.getYVelocity(mVelocityTracker, pointerId)/30;
+                        controlBallMotionSpeed();
                         break;
-                    
+
                     case MotionEvent.ACTION_CANCEL:
                         // Return a VelocityTracker object back to be re-used by others.
                         mVelocityTracker.recycle();
@@ -264,6 +265,30 @@ public class Gameplay extends AppCompatActivity {
         printToLog("Touch", "Ball is NOT touched");
         FingerDown = false;
         return false;
+    }
+
+    //Method called when Ball Speed is being set when flick gesture is used.
+    private void controlBallMotionSpeed()
+    {
+        if(BallSpeedMotion_x > 80)
+        {
+            BallSpeedMotion_x = 80;
+        }
+        else if(BallSpeedMotion_x < -80)
+        {
+            BallSpeedMotion_x = -80;
+        }
+
+        if(BallSpeedMotion_y > 80)
+        {
+            BallSpeedMotion_y = 80;
+        }
+        else if(BallSpeedMotion_y < -80)
+        {
+            BallSpeedMotion_y = -80;
+        }
+        printToLog("Speed", " Ball Speed : " + BallSpeedMotion_x + ", " + BallSpeed_y);
+
     }
 
     private void printToLog(String tag, String msg)
