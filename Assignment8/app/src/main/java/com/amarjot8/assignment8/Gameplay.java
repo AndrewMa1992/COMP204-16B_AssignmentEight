@@ -8,12 +8,15 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.hardware.SensorManager;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.EventLog;
 import android.util.Log;
 import android.view.Display;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 
@@ -28,6 +31,13 @@ import java.util.TimerTask;
 
 public class Gameplay extends AppCompatActivity {
 
+    protected int Ball_x, Ball_y;
+    protected int Ballradius = 100;
+
+    protected int BallSpeed_x, BallSpeed_y = 0;
+    protected int sensor_x = 0;
+
+    private boolean FingerDown = false;
 
     @Override
     protected void onStop()
@@ -72,9 +82,6 @@ public class Gameplay extends AppCompatActivity {
     //Contains methods which Draws ball, Cans to screen
     public class DrawingView extends View
     {
-        protected int Ball_x, Ball_y;
-        protected int Ballradius = 100;
-
         protected long last_tick=-1,
                 timer=10000, tick_period=1000;
 
@@ -86,6 +93,22 @@ public class Gameplay extends AppCompatActivity {
             super(context);
             setBallxy();
             last_tick=System.currentTimeMillis();
+        }
+
+        @Override
+        public boolean onTouchEvent(MotionEvent event) {
+            switch (event.getActionMasked())
+            {
+                //When user makes a touch, check if users touch is on ball
+                case MotionEvent.ACTION_DOWN:
+                    isFingerDownOnBall((int) event.getX(), (int) event.getY());
+                    break;
+                //when user lifts finger
+                case MotionEvent.ACTION_UP:
+                    FingerDown = false;
+                    break;
+            }
+            return true;
         }
 
         @Override
@@ -104,8 +127,6 @@ public class Gameplay extends AppCompatActivity {
             }
 
             controlBallxy(c);
-            DrawBall(c,Ball_x,Ball_y,Ballradius);
-
             DrawBall(c,Ball_x,Ball_y,Ballradius);
 
             //populate the list and draw all cans
@@ -197,7 +218,19 @@ public class Gameplay extends AppCompatActivity {
     }
 
 
-
+    //Checks if cordinates are on Ball 
+    private boolean isFingerDownOnBall(int eventX, int eventY)
+    {
+        if((eventX <= (Ball_x + Ballradius) && (eventX > Ball_x - Ballradius)) && (eventY <= (Ball_y + Ballradius) && (eventY > Ball_y - Ballradius)))
+        {
+            FingerDown = true;
+            printToLog("Touch", "Ball is touched");
+            return true;
+        }
+        printToLog("Touch", "Ball is NOT touched");
+        FingerDown = false;
+        return false;
+    }
 
     private void printToLog(String tag, String msg)
     {
