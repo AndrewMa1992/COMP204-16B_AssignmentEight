@@ -36,7 +36,7 @@ public class Gameplay extends AppCompatActivity {
     protected int Ball_x, Ball_y;
     protected int Ballradius = 100;
 
-        int spx , spy = -5;
+    //    int spx , spy = -5;
 
     protected int BallSpeed_x, BallSpeed_y = 0;
     protected int BallSpeedMotion_x, BallSpeedMotion_y = 0;
@@ -133,16 +133,11 @@ public class Gameplay extends AppCompatActivity {
                         // and getYVelocity() to retrieve the velocity for each pointer ID.
                         mVelocityTracker.computeCurrentVelocity(1000);
                         // Log velocity of pixels per second
-                        // Best practice to use VelocityTrackerCompat where possible.
-                        Log.d("", "X velocity: " +
-                                VelocityTrackerCompat.getXVelocity(mVelocityTracker,
-                                        pointerId));
-                        BallSpeedMotion_x =  10;//(int)VelocityTrackerCompat.getXVelocity(mVelocityTracker, pointerId) - ((int)VelocityTrackerCompat.getXVelocity(mVelocityTracker, pointerId) / 2);
-                        Log.d("", "Y velocity: " +
-                                VelocityTrackerCompat.getYVelocity(mVelocityTracker,
-                                        pointerId));
-                        BallSpeedMotion_y = 10;//(int) VelocityTrackerCompat.getYVelocity(mVelocityTracker, pointerId) - ((int)VelocityTrackerCompat.getYVelocity(mVelocityTracker, pointerId) / 2);
+
+                        BallSpeedMotion_x =  (int)VelocityTrackerCompat.getXVelocity(mVelocityTracker, pointerId) /30;
+                        BallSpeedMotion_y = (int)VelocityTrackerCompat.getYVelocity(mVelocityTracker, pointerId)/30;
                         break;
+                    
                     case MotionEvent.ACTION_CANCEL:
                         // Return a VelocityTracker object back to be re-used by others.
                         mVelocityTracker.recycle();
@@ -192,17 +187,17 @@ public class Gameplay extends AppCompatActivity {
         //Makes sure ball cannot go out of screen except from top
         protected void controlBallxy(Canvas c)
         {
-            Ball_x += spx;
-            Ball_y += spy;
+            Ball_x += BallSpeedMotion_x;
+            Ball_y += BallSpeedMotion_y;
 
-            if (Ball_x - Ballradius < 0) { Ball_x = 0 + Ballradius; spx = -spx; }
-            if (Ball_x + Ballradius > c.getWidth()) { Ball_x = c.getWidth() - Ballradius; spx = -spx; }
-            if (Ball_y  - Ballradius< 0) { Ball_y = 0 + Ballradius; spy = -spy; }
+            if (Ball_x - Ballradius < 0) { Ball_x = 0 + Ballradius; BallSpeedMotion_x = -BallSpeedMotion_x; }
+            if (Ball_x + Ballradius > c.getWidth()) { Ball_x = c.getWidth() - Ballradius; BallSpeedMotion_x = -BallSpeedMotion_x; }
+            if (Ball_y  - Ballradius< 0) { Ball_y = 0 + Ballradius; BallSpeedMotion_y = -BallSpeedMotion_y; }
             //When ball is going outside the phone, it stops it.
-            if (Ball_x - Ballradius < 0) { Ball_x = 0 + Ballradius; spx = -spx; }
-            if (Ball_x + Ballradius > c.getWidth()) { Ball_x = c.getWidth() - Ballradius; spx = -spx; }
-            if (Ball_y  - Ballradius< 0) { Ball_y = 0 + Ballradius; spy = -spy; }
-            if (Ball_y + Ballradius > c.getHeight()) { Ball_y = c.getHeight() - Ballradius; spy = -spy; }
+            if (Ball_x - Ballradius < 0) { Ball_x = 0 + Ballradius; BallSpeedMotion_x = -BallSpeedMotion_x; }
+            if (Ball_x + Ballradius > c.getWidth()) { Ball_x = c.getWidth() - Ballradius; BallSpeedMotion_x = -BallSpeedMotion_x; }
+            if (Ball_y  - Ballradius< 0) { Ball_y = 0 + Ballradius; BallSpeedMotion_y = -BallSpeedMotion_y; }
+            if (Ball_y + Ballradius > c.getHeight()) { Ball_y = c.getHeight() - Ballradius; BallSpeedMotion_y = -BallSpeedMotion_y; }
         }
         //Sets the ball on bottom center of phone
         protected void setBallxy()
