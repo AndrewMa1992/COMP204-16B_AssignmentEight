@@ -11,12 +11,14 @@ import android.graphics.Rect;
 import android.hardware.SensorManager;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
+import android.support.v4.view.VelocityTrackerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.EventLog;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
+import android.view.VelocityTracker;
 import android.view.View;
 import android.view.WindowManager;
 
@@ -28,16 +30,23 @@ import java.util.ListIterator;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
-
+//https://developer.android.com/training/gestures/movement.html
 public class Gameplay extends AppCompatActivity {
 
     protected int Ball_x, Ball_y;
     protected int Ballradius = 100;
 
+        int spx , spy = -5;
+
     protected int BallSpeed_x, BallSpeed_y = 0;
+    protected int BallSpeedMotion_x, BallSpeedMotion_y = 0;
     protected int sensor_x = 0;
 
     private boolean FingerDown = false;
+
+    private static final String DEBUG_TAG = "Velocity";
+
+    private VelocityTracker mVelocityTracker = null;
 
     @Override
     protected void onStop()
@@ -83,7 +92,7 @@ public class Gameplay extends AppCompatActivity {
     public class DrawingView extends View
     {
         protected long last_tick=-1,
-                timer=10000, tick_period=1000;
+                timer=60000, tick_period=1000;
 
         protected final static int numCans=5;
         protected List<Can> Cans=new ArrayList<>();
@@ -96,20 +105,54 @@ public class Gameplay extends AppCompatActivity {
         }
 
         @Override
-        public boolean onTouchEvent(MotionEvent event) {
-            switch (event.getActionMasked())
-            {
-                //When user makes a touch, check if users touch is on ball
-                case MotionEvent.ACTION_DOWN:
-                    isFingerDownOnBall((int) event.getX(), (int) event.getY());
-                    break;
-                //when user lifts finger
-                case MotionEvent.ACTION_UP:
-                    FingerDown = false;
-                    break;
+        public boolean onTouchEvent(MotionEvent event)
+        {
+            int index = event.getActionIndex();
+            //Storing users action
+            int action = event.getActionMasked();
+            int pointerId = event.getPointerId(index);
+
+            //Checks if user touched the ball
+            if(isFingerDownOnBall((int) event.getX(), (int) event.getY())) {
+                switch (action) {
+                    case MotionEvent.ACTION_DOWN:
+                        if (mVelocityTracker == null) {
+                            // Retrieve a new VelocityTracker object to watch the velocity of a motion.
+                            mVelocityTracker = VelocityTracker.obtain();
+                        } else {
+                            // Reset the velocity tracker back to its initial state.
+                            mVelocityTracker.clear();
+                        }
+                        // Add a user's movement to the tracker.
+                        mVelocityTracker.addMovement(event);
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        mVelocityTracker.addMovement(event);
+                        // When you want to determine the velocity, call
+                        // computeCurrentVelocity(). Then call getXVelocity()
+                        // and getYVelocity() to retrieve the velocity for each pointer ID.
+                        mVelocityTracker.computeCurrentVelocity(1000);
+                        // Log velocity of pixels per second
+                        // Best practice to use VelocityTrackerCompat where possible.
+                        Log.d("", "X velocity: " +
+                                VelocityTrackerCompat.getXVelocity(mVelocityTracker,
+                                        pointerId));
+                        BallSpeedMotion_x =  10;//(int)VelocityTrackerCompat.getXVelocity(mVelocityTracker, pointerId) - ((int)VelocityTrackerCompat.getXVelocity(mVelocityTracker, pointerId) / 2);
+                        Log.d("", "Y velocity: " +
+                                VelocityTrackerCompat.getYVelocity(mVelocityTracker,
+                                        pointerId));
+                        BallSpeedMotion_y = 10;//(int) VelocityTrackerCompat.getYVelocity(mVelocityTracker, pointerId) - ((int)VelocityTrackerCompat.getYVelocity(mVelocityTracker, pointerId) / 2);
+                        break;
+                    case MotionEvent.ACTION_CANCEL:
+                        // Return a VelocityTracker object back to be re-used by others.
+                        mVelocityTracker.recycle();
+                        break;
+                }
             }
             return true;
         }
+
+
 
         @Override
         protected void onDraw(Canvas c)
@@ -149,21 +192,17 @@ public class Gameplay extends AppCompatActivity {
         //Makes sure ball cannot go out of screen except from top
         protected void controlBallxy(Canvas c)
         {
-            //Stop it from left
-            if(Ball_x - Ballradius < 0 )
-            {
-                Ball_x = 0 + Ballradius;
-            }
-            //Stop it from right
-            if(Ball_x + Ballradius > c.getWidth())
-            {
-                Ball_x = c.getWidth() - Ballradius;
-            }
-            //Stop it from bottom
-            if(Ball_y + Ballradius > c.getHeight())
-            {
-                Ball_y  = c.getHeight() - Ballradius;
-            }
+            Ball_x += spx;
+            Ball_y += spy;
+
+            if (Ball_x - Ballradius < 0) { Ball_x = 0 + Ballradius; spx = -spx; }
+            if (Ball_x + Ballradius > c.getWidth()) { Ball_x = c.getWidth() - Ballradius; spx = -spx; }
+            if (Ball_y  - Ballradius< 0) { Ball_y = 0 + Ballradius; spy = -spy; }
+            //When ball is going outside the phone, it stops it.
+            if (Ball_x - Ballradius < 0) { Ball_x = 0 + Ballradius; spx = -spx; }
+            if (Ball_x + Ballradius > c.getWidth()) { Ball_x = c.getWidth() - Ballradius; spx = -spx; }
+            if (Ball_y  - Ballradius< 0) { Ball_y = 0 + Ballradius; spy = -spy; }
+            if (Ball_y + Ballradius > c.getHeight()) { Ball_y = c.getHeight() - Ballradius; spy = -spy; }
         }
         //Sets the ball on bottom center of phone
         protected void setBallxy()
@@ -214,11 +253,11 @@ public class Gameplay extends AppCompatActivity {
     {
         Paint p = new Paint();
         p.setColor(Color.BLUE);
-        c.drawCircle(x,y,radius,p);
+        c.drawCircle(Ball_x,Ball_y,radius,p);
     }
 
 
-    //Checks if cordinates are on Ball 
+    //Checks if cordinates are on Ball
     private boolean isFingerDownOnBall(int eventX, int eventY)
     {
         if((eventX <= (Ball_x + Ballradius) && (eventX > Ball_x - Ballradius)) && (eventY <= (Ball_y + Ballradius) && (eventY > Ball_y - Ballradius)))
