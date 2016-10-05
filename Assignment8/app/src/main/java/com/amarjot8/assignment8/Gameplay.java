@@ -36,8 +36,6 @@ public class Gameplay extends AppCompatActivity {
     protected int Ball_x, Ball_y;
     protected int Ballradius = 100;
 
-    //    int spx , spy = -5;
-
     protected int BallSpeed_x, BallSpeed_y = 0;
     protected int BallSpeedMotion_x, BallSpeedMotion_y = 0;
     protected int sensor_x = 0;
@@ -133,9 +131,9 @@ public class Gameplay extends AppCompatActivity {
                         // and getYVelocity() to retrieve the velocity for each pointer ID.
                         mVelocityTracker.computeCurrentVelocity(1000);
                         // Log velocity of pixels per second
-
-                        BallSpeedMotion_x =  (int)VelocityTrackerCompat.getXVelocity(mVelocityTracker, pointerId) /30;
-                        BallSpeedMotion_y = (int)VelocityTrackerCompat.getYVelocity(mVelocityTracker, pointerId)/30;
+                        //Divided by offsent since velcity is too great for gampeplay
+                        BallSpeedMotion_x =  (int)VelocityTrackerCompat.getXVelocity(mVelocityTracker, pointerId) /40;
+                        BallSpeedMotion_y = (int)VelocityTrackerCompat.getYVelocity(mVelocityTracker, pointerId)/40;
                         controlBallMotionSpeed();
                         break;
 
@@ -193,11 +191,11 @@ public class Gameplay extends AppCompatActivity {
 
             if (Ball_x - Ballradius < 0) { Ball_x = 0 + Ballradius; BallSpeedMotion_x = -BallSpeedMotion_x; }
             if (Ball_x + Ballradius > c.getWidth()) { Ball_x = c.getWidth() - Ballradius; BallSpeedMotion_x = -BallSpeedMotion_x; }
-            if (Ball_y  - Ballradius< 0) { Ball_y = 0 + Ballradius; BallSpeedMotion_y = -BallSpeedMotion_y; }
+         //   if (Ball_y  - Ballradius< 0) { Ball_y = 0 + Ballradius; BallSpeedMotion_y = -BallSpeedMotion_y; }
             //When ball is going outside the phone, it stops it.
             if (Ball_x - Ballradius < 0) { Ball_x = 0 + Ballradius; BallSpeedMotion_x = -BallSpeedMotion_x; }
             if (Ball_x + Ballradius > c.getWidth()) { Ball_x = c.getWidth() - Ballradius; BallSpeedMotion_x = -BallSpeedMotion_x; }
-            if (Ball_y  - Ballradius< 0) { Ball_y = 0 + Ballradius; BallSpeedMotion_y = -BallSpeedMotion_y; }
+         //   if (Ball_y  - Ballradius< 0) { Ball_y = 0 + Ballradius; BallSpeedMotion_y = -BallSpeedMotion_y; }
             if (Ball_y + Ballradius > c.getHeight()) { Ball_y = c.getHeight() - Ballradius; BallSpeedMotion_y = -BallSpeedMotion_y; }
         }
         //Sets the ball on bottom center of phone
@@ -249,6 +247,7 @@ public class Gameplay extends AppCompatActivity {
     {
         Paint p = new Paint();
         p.setColor(Color.BLUE);
+
         c.drawCircle(Ball_x,Ball_y,radius,p);
     }
 
@@ -256,7 +255,7 @@ public class Gameplay extends AppCompatActivity {
     //Checks if cordinates are on Ball
     private boolean isFingerDownOnBall(int eventX, int eventY)
     {
-        if((eventX <= (Ball_x + Ballradius) && (eventX > Ball_x - Ballradius)) && (eventY <= (Ball_y + Ballradius) && (eventY > Ball_y - Ballradius)))
+        if((eventX <= (Ball_x + Ballradius + 10) && (eventX > Ball_x - Ballradius +10)) && (eventY <= (Ball_y + Ballradius + 10) && (eventY > Ball_y - Ballradius + 10)))
         {
             FingerDown = true;
             printToLog("Touch", "Ball is touched");
