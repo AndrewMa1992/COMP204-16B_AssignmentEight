@@ -17,6 +17,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.view.VelocityTrackerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.style.LineBackgroundSpan;
 import android.util.EventLog;
 import android.util.Log;
 import android.view.Display;
@@ -127,8 +128,11 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
         protected long last_tick=-1,
                 timer=60000, tick_period=1000;
 
+        protected int can_dx=10;
         protected final static int numCans=5;
         protected List<Can> Cans=new ArrayList<>();
+
+        protected final Paint p=new Paint();
 
         public DrawingView(final Context context)
         {
@@ -187,8 +191,6 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
         @Override
         protected void onDraw(Canvas c)
         {
-            //multiple methods will need a Paint object; might as well put it here.
-            final Paint p = new Paint();
 
             //timer
             if(System.currentTimeMillis()-last_tick>=tick_period){
@@ -202,13 +204,17 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
             controlBallxy(c);
             DrawBall(c,Ball_x,Ball_y,Ballradius);
 
-            //populate the list and draw all cans
-            if (Cans.isEmpty()){
-                for (int i=0; i<numCans; i++)
-                    Cans.add(new Can(c));
+            if(Cans.isEmpty()) {
+                for(int i=1; i<=numCans; i++){
+                    Cans.add(new Can(c.getWidth()/numCans*i, c));
+                }
             }
             for (Can can:Cans){
-                can.Draw(c,p);
+                if(can.isTouching(Ball_x, Ball_y, Ballradius)){
+                    can.hide();
+                }
+                can.draw(c,p);
+                can.move(can_dx, c);
             }
 
             //drawing timer last so its always on top layer
@@ -240,6 +246,7 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
             if (Ball_y  - Ballradius< 0) {restball();}
             if (Ball_y + Ballradius > c.getHeight()) { Ball_y = c.getHeight() - Ballradius; BallSpeedMotion_y = -BallSpeedMotion_y; }
         }
+
         //Sets the ball on bottom center of phone
         protected void setBallxy()
         {
@@ -261,39 +268,6 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
         }
     }
 
-    /**
-     * class for can object. Contains all relevent methods and variables
-     */
-    public class Can{
-        private static final int width=100;
-        private static final int height=300;
-        private int x;
-        private int y;
-
-        /**
-         * picks random x and y coordinates
-         * @param c
-         */
-        Can(Canvas c){
-            Random rand=new Random();
-
-            x=rand.nextInt(c.getWidth()-width);
-            //added extra brackets in case BEDMAS is not followed
-            y=rand.nextInt((c.getHeight()/3)-height);
-        }
-
-        /**
-         * draws the can
-         * @param c
-         * @param p
-         */
-        public void Draw(Canvas c, Paint p){
-            c.drawRect(x, y, x+width, y+height, p);
-        }
-    }
-
-
-
     //Simply Draws ball at given location with given radius
     protected void DrawBall(Canvas c, int x, int y, int radius)
     {
@@ -302,7 +276,6 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
 
         c.drawCircle(Ball_x,Ball_y,radius,p);
     }
-
 
     //Checks if cordinates are on Ball
     private boolean isFingerDownOnBall(int eventX, int eventY)
@@ -343,8 +316,6 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
         }
         printToLog("Speed", " Ball Speed : " + BallSpeedMotion_x + ", " + BallSpeed_y);
     }
-
-
     private void printToLog(String tag, String msg)
     {
         Log.e(tag,msg);
