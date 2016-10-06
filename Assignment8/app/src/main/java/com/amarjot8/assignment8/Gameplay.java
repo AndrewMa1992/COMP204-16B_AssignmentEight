@@ -170,7 +170,7 @@ public class Gameplay extends AppCompatActivity {
 
             if(Cans.isEmpty()) {
                 for(int i=1; i<=numCans; i++){
-                    Cans.add(new Can(c.getWidth()/i, c));
+                    Cans.add(new Can(c.getWidth()/numCans*i, c));
                 }
             }
             for (Can can:Cans){

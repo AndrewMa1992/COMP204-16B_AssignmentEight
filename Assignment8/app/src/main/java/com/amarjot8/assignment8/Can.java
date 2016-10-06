@@ -17,7 +17,8 @@ import java.util.Random;
 public class Can{
     private static final int width=100, height=300;
     private int x, y;
-    public boolean visible=true;
+    private boolean visible=true;
+    private Random rand=new Random();
 
     /**
      * picks y coordinate
@@ -25,7 +26,6 @@ public class Can{
      * @param c
      */
     Can(int x_start, Canvas c){
-        Random rand=new Random();
         x=x_start;
         //added extra brackets in case BEDMAS is not followed
         y=rand.nextInt((c.getHeight()/3)-height);
@@ -70,6 +70,7 @@ public class Can{
         x=x-dx;
         if(offCanvas(c)){
             x = c.getWidth();
+            y=rand.nextInt((c.getHeight()/3)-height);
             visible = true;
         }
     }
