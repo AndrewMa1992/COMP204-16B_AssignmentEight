@@ -8,6 +8,9 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
@@ -31,20 +34,43 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 //https://developer.android.com/training/gestures/movement.html
-public class Gameplay extends AppCompatActivity {
+public class Gameplay extends AppCompatActivity implements SensorEventListener {
 
     protected int Ball_x, Ball_y;
     protected int Ballradius = 100;
 
     protected int BallSpeed_x, BallSpeed_y = 0;
     protected int BallSpeedMotion_x, BallSpeedMotion_y = 0;
-    protected int sensor_x = 0;
+
+    //sensor's values will be sored
+    protected float sensor_x = 0;
+
+    //Used to store Sesnor/ Register listner / Unregister listner
+    SensorManager sMang;
+    Sensor acc;
 
     private boolean FingerDown = false;
+    private boolean BallMoved = false;
 
     private static final String DEBUG_TAG = "Velocity";
-
     private VelocityTracker mVelocityTracker = null;
+
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+
+        Sensor s = event.sensor;
+        //checking sensor that triggered this method is Accelerometer
+        if (s.getType() == Sensor.TYPE_ACCELEROMETER) {
+            //Extracting information from sensor
+            sensor_x = event.values[0];
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
 
     @Override
     protected void onStop()
@@ -56,12 +82,16 @@ public class Gameplay extends AppCompatActivity {
     protected void onPause()
     {
         super.onPause();
+        //Unregistering listner
+        sMang.unregisterListener(this);
         printToLog("LifeCycle : ", "onPause");
     }
     @Override
     protected void onResume()
     {
         super.onResume();
+        //Registering Listener
+        sMang.registerListener(this, acc, SensorManager.SENSOR_DELAY_NORMAL);
         printToLog("LifeCycle : ", "onResume");
     }
 
@@ -77,6 +107,11 @@ public class Gameplay extends AppCompatActivity {
 
         //Locking View in portait
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+
+        //Used for Accelerometer sensor
+        sMang = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        acc = sMang.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
     }
 
@@ -112,6 +147,7 @@ public class Gameplay extends AppCompatActivity {
 
             //Checks if user touched the ball
             if(isFingerDownOnBall((int) event.getX(), (int) event.getY())) {
+                BallMoved = true;
                 switch (action) {
                     case MotionEvent.ACTION_DOWN:
                         if (mVelocityTracker == null) {
@@ -189,10 +225,18 @@ public class Gameplay extends AppCompatActivity {
             Ball_x += BallSpeedMotion_x;
             Ball_y += BallSpeedMotion_y;
 
+            //When ball is moving applying phones tilt
+            if(BallMoved)
+            {
+                //Increasing affect of tilt and correnting distance
+                Ball_x += -(sensor_x+sensor_x);
+            }
+
             //When ball is going outside the phone, it bouces it exept if y < 0 then respawn ball.
             if (Ball_x - Ballradius < 0) { Ball_x = 0 + Ballradius; BallSpeedMotion_x = -BallSpeedMotion_x; }
             if (Ball_x + Ballradius > c.getWidth()) { Ball_x = c.getWidth() - Ballradius; BallSpeedMotion_x = -BallSpeedMotion_x; }
-            //Ball going past y < 0  
+
+            //Ball going past y < 0
             if (Ball_y  - Ballradius< 0) {restball();}
             if (Ball_y + Ballradius > c.getHeight()) { Ball_y = c.getHeight() - Ballradius; BallSpeedMotion_y = -BallSpeedMotion_y; }
         }
@@ -213,6 +257,7 @@ public class Gameplay extends AppCompatActivity {
             BallSpeedMotion_x = 0;
             BallSpeedMotion_y = 0;
             setBallxy();
+            BallMoved = false;
         }
     }
 
