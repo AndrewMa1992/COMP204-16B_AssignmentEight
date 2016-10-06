@@ -50,6 +50,7 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
     Sensor acc;
 
     private boolean FingerDown = false;
+    private boolean BallMoved = false;
 
     private static final String DEBUG_TAG = "Velocity";
     private VelocityTracker mVelocityTracker = null;
@@ -146,6 +147,7 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
 
             //Checks if user touched the ball
             if(isFingerDownOnBall((int) event.getX(), (int) event.getY())) {
+                BallMoved = true;
                 switch (action) {
                     case MotionEvent.ACTION_DOWN:
                         if (mVelocityTracker == null) {
@@ -223,6 +225,13 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
             Ball_x += BallSpeedMotion_x;
             Ball_y += BallSpeedMotion_y;
 
+            //When ball is moving applying phones tilt
+            if(BallMoved)
+            {
+                //Increasing affect of tilt and correnting direction
+                Ball_x += -(sensor_x+sensor_x);
+            }
+
             //When ball is going outside the phone, it bouces it exept if y < 0 then respawn ball.
             if (Ball_x - Ballradius < 0) { Ball_x = 0 + Ballradius; BallSpeedMotion_x = -BallSpeedMotion_x; }
             if (Ball_x + Ballradius > c.getWidth()) { Ball_x = c.getWidth() - Ballradius; BallSpeedMotion_x = -BallSpeedMotion_x; }
@@ -249,6 +258,7 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
             BallSpeedMotion_x = 0;
             BallSpeedMotion_y = 0;
             setBallxy();
+            BallMoved = false;
         }
     }
 
