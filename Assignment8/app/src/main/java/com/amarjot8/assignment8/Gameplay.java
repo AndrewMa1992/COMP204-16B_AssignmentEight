@@ -228,13 +228,11 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
             //When ball is moving applying phones tilt
             if(BallMoved)
             {
-                //Increasing affect of tilt and correnting direction
+                //Increasing affect of tilt and correnting distance
                 Ball_x += -(sensor_x+sensor_x);
             }
 
             //When ball is going outside the phone, it bouces it exept if y < 0 then respawn ball.
-            if (Ball_x - Ballradius < 0) { Ball_x = 0 + Ballradius; BallSpeedMotion_x = -BallSpeedMotion_x; }
-            if (Ball_x + Ballradius > c.getWidth()) { Ball_x = c.getWidth() - Ballradius; BallSpeedMotion_x = -BallSpeedMotion_x; }
             if (Ball_x - Ballradius < 0) { Ball_x = 0 + Ballradius; BallSpeedMotion_x = -BallSpeedMotion_x; }
             if (Ball_x + Ballradius > c.getWidth()) { Ball_x = c.getWidth() - Ballradius; BallSpeedMotion_x = -BallSpeedMotion_x; }
             //Ball going past y < 0
