@@ -4,6 +4,7 @@ package com.amarjot8.assignment8;
  * Created by Joseph on 10/6/2016.
  */
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
@@ -20,15 +21,15 @@ public class Can{
     private int y;
 
     /**
-     * picks random x and y coordinates
-     * @param c
+     * picks y coordinate
+     * @param x_start left edge of can
+     * @param dv
      */
-    Can(Canvas c){
+    Can(int x_start, Gameplay.DrawingView dv){
         Random rand=new Random();
-
-        x=c.getWidth()-width;
+        x=x_start;
         //added extra brackets in case BEDMAS is not followed
-        y=rand.nextInt((c.getHeight()/3)-height);
+        y=rand.nextInt((dv.getHeight()/3)-height);
     }
 
     /**

@@ -83,6 +83,8 @@ public class Gameplay extends AppCompatActivity {
         protected final static int numCans=5;
         protected List<Can> Cans=new ArrayList<>();
 
+        protected final Paint p=new Paint();
+
         public DrawingView(final Context context)
         {
             super(context);
@@ -93,8 +95,6 @@ public class Gameplay extends AppCompatActivity {
         @Override
         protected void onDraw(Canvas c)
         {
-            //multiple methods will need a Paint object; might as well put it here.
-            final Paint p = new Paint();
 
             //timer
             if(System.currentTimeMillis()-last_tick>=tick_period){
@@ -110,9 +110,10 @@ public class Gameplay extends AppCompatActivity {
 
             DrawBall(c,Ball_x,Ball_y,Ballradius);
 
-            //populate the list and draw all cans
-            if (Cans.isEmpty()){
-                Cans.add(new Can(c));
+            if(Cans.isEmpty()) {
+                for(int i=1; i<=numCans; i++){
+                    Cans.add(new Can(getWidth()/i, this));
+                }
             }
             for (Can can:Cans){
                 can.Move(can_dx);
