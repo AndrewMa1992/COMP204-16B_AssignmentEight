@@ -235,6 +235,7 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
             //When ball is going outside the phone, it bouces it exept if y < 0 then respawn ball.
             if (Ball_x - Ballradius < 0) { Ball_x = 0 + Ballradius; BallSpeedMotion_x = -BallSpeedMotion_x; }
             if (Ball_x + Ballradius > c.getWidth()) { Ball_x = c.getWidth() - Ballradius; BallSpeedMotion_x = -BallSpeedMotion_x; }
+
             //Ball going past y < 0
             if (Ball_y  - Ballradius< 0) {restball();}
             if (Ball_y + Ballradius > c.getHeight()) { Ball_y = c.getHeight() - Ballradius; BallSpeedMotion_y = -BallSpeedMotion_y; }
