@@ -262,11 +262,14 @@ public class Gameplay extends AppCompatActivity {
     //Checks if cordinates are on Ball
     private boolean isFingerDownOnBall(int eventX, int eventY)
     {
-        if((eventX <= (Ball_x + Ballradius + 10) && (eventX > Ball_x - Ballradius +10)) && (eventY <= (Ball_y + Ballradius + 10) && (eventY > Ball_y - Ballradius + 10)))
+        //Wont let the user hold the ball when ball has travelled a certain y cord
+        if(eventY > 1600)
         {
-            FingerDown = true;
-            printToLog("Touch", "Ball is touched");
-            return true;
+            if ((eventX <= (Ball_x + Ballradius + 10) && (eventX > Ball_x - Ballradius + 10)) && (eventY <= (Ball_y + Ballradius + 10) && (eventY > Ball_y - Ballradius + 10))) {
+                FingerDown = true;
+                printToLog("Touch", "Ball is touched");
+                return true;
+            }
         }
         printToLog("Touch", "Ball is NOT touched");
         FingerDown = false;
