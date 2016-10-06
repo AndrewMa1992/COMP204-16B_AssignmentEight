@@ -189,13 +189,13 @@ public class Gameplay extends AppCompatActivity {
             Ball_x += BallSpeedMotion_x;
             Ball_y += BallSpeedMotion_y;
 
+            //When ball is going outside the phone, it bouces it exept if y < 0 then respawn ball.
             if (Ball_x - Ballradius < 0) { Ball_x = 0 + Ballradius; BallSpeedMotion_x = -BallSpeedMotion_x; }
             if (Ball_x + Ballradius > c.getWidth()) { Ball_x = c.getWidth() - Ballradius; BallSpeedMotion_x = -BallSpeedMotion_x; }
-         //   if (Ball_y  - Ballradius< 0) { Ball_y = 0 + Ballradius; BallSpeedMotion_y = -BallSpeedMotion_y; }
-            //When ball is going outside the phone, it stops it.
             if (Ball_x - Ballradius < 0) { Ball_x = 0 + Ballradius; BallSpeedMotion_x = -BallSpeedMotion_x; }
             if (Ball_x + Ballradius > c.getWidth()) { Ball_x = c.getWidth() - Ballradius; BallSpeedMotion_x = -BallSpeedMotion_x; }
-         //   if (Ball_y  - Ballradius< 0) { Ball_y = 0 + Ballradius; BallSpeedMotion_y = -BallSpeedMotion_y; }
+            //Ball going past y < 0  
+            if (Ball_y  - Ballradius< 0) {restball();}
             if (Ball_y + Ballradius > c.getHeight()) { Ball_y = c.getHeight() - Ballradius; BallSpeedMotion_y = -BallSpeedMotion_y; }
         }
         //Sets the ball on bottom center of phone
@@ -206,6 +206,15 @@ public class Gameplay extends AppCompatActivity {
             display.getSize(dimensions);
             Ball_x = dimensions.x - (dimensions.x /2);
             Ball_y = dimensions.y - (dimensions.x /4);
+        }
+        //Resets Ball back to its initial position
+        private void restball()
+        {
+            BallSpeed_x = 0;
+            BallSpeed_y = 0;
+            BallSpeedMotion_x = 0;
+            BallSpeedMotion_y = 0;
+            setBallxy();
         }
     }
 
@@ -287,8 +296,8 @@ public class Gameplay extends AppCompatActivity {
             BallSpeedMotion_y = -80;
         }
         printToLog("Speed", " Ball Speed : " + BallSpeedMotion_x + ", " + BallSpeed_y);
-
     }
+
 
     private void printToLog(String tag, String msg)
     {
