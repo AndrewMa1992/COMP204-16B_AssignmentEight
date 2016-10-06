@@ -79,6 +79,7 @@ public class Gameplay extends AppCompatActivity {
         protected long last_tick=-1,
                 timer=10000, tick_period=1000;
 
+        protected int can_velocity=10;
         protected final static int numCans=5;
         protected List<Can> Cans=new ArrayList<>();
 
@@ -172,7 +173,7 @@ public class Gameplay extends AppCompatActivity {
         Can(Canvas c){
             Random rand=new Random();
 
-            x=rand.nextInt(c.getWidth()-width);
+            x=c.getWidth()-width;
             //added extra brackets in case BEDMAS is not followed
             y=rand.nextInt((c.getHeight()/3)-height);
         }
@@ -193,7 +194,7 @@ public class Gameplay extends AppCompatActivity {
          * @param radius
          * @return
          */
-        public boolean isTouching(int circ_x, int circ_y, int radius){
+        public boolean IsTouching(int circ_x, int circ_y, int radius){
             Point[] corners=new Point[]{new Point(x, y), new Point(x+width, y),
                     new Point(x, y+width), new Point(x+width, y+height)};
             for(Point p : corners){
@@ -202,6 +203,23 @@ public class Gameplay extends AppCompatActivity {
                 if(Math.sqrt(Math.pow(circ_x-p.x, 2)+Math.pow(circ_y-p.y, 2))<=radius)
                     return true;
             }
+            return false;
+        }
+
+        /**
+         * moves can left by given distance
+         * @param dx
+         */
+        public void Move(int dx){ x=x-dx; }
+
+        /**
+         * returns true if can is completely off canvas
+         * @param c
+         * @return
+         */
+        public boolean OffCanvas(Canvas c){
+            if(x+width<0||x>c.getWidth()||y+height<0||y>c.getHeight())
+                return true;
             return false;
         }
     }
