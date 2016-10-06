@@ -12,6 +12,7 @@ import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.style.LineBackgroundSpan;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
@@ -183,6 +184,25 @@ public class Gameplay extends AppCompatActivity {
          */
         public void Draw(Canvas c, Paint p){
             c.drawRect(x, y, x+width, y+height, p);
+        }
+
+        /**
+         * calculates if the can is touching a circle with given coordinates and radius
+         * @param circ_x
+         * @param circ_y
+         * @param radius
+         * @return
+         */
+        public boolean isTouching(int circ_x, int circ_y, int radius){
+            Point[] corners=new Point[]{new Point(x, y), new Point(x+width, y),
+                    new Point(x, y+width), new Point(x+width, y+height)};
+            for(Point p : corners){
+                //PLEASE CHECK THIS MATH! I think this should calculate the distance
+                //between the circle and point p, but I'm pretty bad at math :/
+                if(Math.sqrt(Math.pow(circ_x-p.x, 2)+Math.pow(circ_y-p.y, 2))<=radius)
+                    return true;
+            }
+            return false;
         }
     }
 
