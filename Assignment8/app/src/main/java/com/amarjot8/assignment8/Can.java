@@ -23,13 +23,13 @@ public class Can{
     /**
      * picks y coordinate
      * @param x_start left edge of can
-     * @param dv
+     * @param c
      */
-    Can(int x_start, Gameplay.DrawingView dv){
+    Can(int x_start, Canvas c){
         Random rand=new Random();
         x=x_start;
         //added extra brackets in case BEDMAS is not followed
-        y=rand.nextInt((dv.getHeight()/3)-height);
+        y=rand.nextInt((c.getHeight()/3)-height);
     }
 
     /**
@@ -64,7 +64,11 @@ public class Can{
      * moves can left by given distance
      * @param dx
      */
-    public void Move(int dx){ x=x-dx; }
+    public void Move(int dx, Canvas c){
+        x=x-dx;
+        if(x-width<=0)
+            x=c.getWidth();
+    }
 
     /**
      * returns true if can is completely off canvas

@@ -112,12 +112,12 @@ public class Gameplay extends AppCompatActivity {
 
             if(Cans.isEmpty()) {
                 for(int i=1; i<=numCans; i++){
-                    Cans.add(new Can(getWidth()/i, this));
+                    Cans.add(new Can(c.getWidth()/i, c));
                 }
             }
             for (Can can:Cans){
-                can.Move(can_dx);
                 can.Draw(c,p);
+                can.Move(can_dx, c);
             }
 
             //drawing timer last so its always on top layer
