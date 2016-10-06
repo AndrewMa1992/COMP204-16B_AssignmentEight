@@ -8,13 +8,18 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.hardware.SensorManager;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
+import android.support.v4.view.VelocityTrackerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.style.LineBackgroundSpan;
+import android.util.EventLog;
 import android.util.Log;
 import android.view.Display;
+import android.view.MotionEvent;
+import android.view.VelocityTracker;
 import android.view.View;
 import android.view.WindowManager;
 
@@ -26,9 +31,21 @@ import java.util.ListIterator;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
-
+//https://developer.android.com/training/gestures/movement.html
 public class Gameplay extends AppCompatActivity {
 
+    protected int Ball_x, Ball_y;
+    protected int Ballradius = 100;
+
+    protected int BallSpeed_x, BallSpeed_y = 0;
+    protected int BallSpeedMotion_x, BallSpeedMotion_y = 0;
+    protected int sensor_x = 0;
+
+    private boolean FingerDown = false;
+
+    private static final String DEBUG_TAG = "Velocity";
+
+    private VelocityTracker mVelocityTracker = null;
 
     @Override
     protected void onStop()
@@ -73,11 +90,8 @@ public class Gameplay extends AppCompatActivity {
     //Contains methods which Draws ball, Cans to screen
     public class DrawingView extends View
     {
-        protected int Ball_x, Ball_y;
-        protected int Ballradius = 100;
-
         protected long last_tick=-1,
-                timer=10000, tick_period=1000;
+                timer=60000, tick_period=1000;
 
         protected int can_dx=10;
         protected final static int numCans=5;
@@ -93,6 +107,52 @@ public class Gameplay extends AppCompatActivity {
         }
 
         @Override
+        public boolean onTouchEvent(MotionEvent event)
+        {
+            int index = event.getActionIndex();
+            //Storing users action
+            int action = event.getActionMasked();
+            int pointerId = event.getPointerId(index);
+
+            //Checks if user touched the ball
+            if(isFingerDownOnBall((int) event.getX(), (int) event.getY())) {
+                switch (action) {
+                    case MotionEvent.ACTION_DOWN:
+                        if (mVelocityTracker == null) {
+                            // Retrieve a new VelocityTracker object to watch the velocity of a motion.
+                            mVelocityTracker = VelocityTracker.obtain();
+                        } else {
+                            // Reset the velocity tracker back to its initial state.
+                            mVelocityTracker.clear();
+                        }
+                        // Add a user's movement to the tracker.
+                        mVelocityTracker.addMovement(event);
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        mVelocityTracker.addMovement(event);
+                        // When you want to determine the velocity, call
+                        // computeCurrentVelocity(). Then call getXVelocity()
+                        // and getYVelocity() to retrieve the velocity for each pointer ID.
+                        mVelocityTracker.computeCurrentVelocity(1000);
+                        // Log velocity of pixels per second
+                        //Divided by offsent since velcity is too great for gampeplay
+                        BallSpeedMotion_x =  (int)VelocityTrackerCompat.getXVelocity(mVelocityTracker, pointerId) /40;
+                        BallSpeedMotion_y = (int)VelocityTrackerCompat.getYVelocity(mVelocityTracker, pointerId)/40;
+                        controlBallMotionSpeed();
+                        break;
+
+                    case MotionEvent.ACTION_CANCEL:
+                        // Return a VelocityTracker object back to be re-used by others.
+                        mVelocityTracker.recycle();
+                        break;
+                }
+            }
+            return true;
+        }
+
+
+
+        @Override
         protected void onDraw(Canvas c)
         {
 
@@ -106,8 +166,6 @@ public class Gameplay extends AppCompatActivity {
             }
 
             controlBallxy(c);
-            DrawBall(c,Ball_x,Ball_y,Ballradius);
-
             DrawBall(c,Ball_x,Ball_y,Ballradius);
 
             if(Cans.isEmpty()) {
@@ -134,21 +192,15 @@ public class Gameplay extends AppCompatActivity {
         //Makes sure ball cannot go out of screen except from top
         protected void controlBallxy(Canvas c)
         {
-            //Stop it from left
-            if(Ball_x - Ballradius < 0 )
-            {
-                Ball_x = 0 + Ballradius;
-            }
-            //Stop it from right
-            if(Ball_x + Ballradius > c.getWidth())
-            {
-                Ball_x = c.getWidth() - Ballradius;
-            }
-            //Stop it from bottom
-            if(Ball_y + Ballradius > c.getHeight())
-            {
-                Ball_y  = c.getHeight() - Ballradius;
-            }
+            Ball_x += BallSpeedMotion_x;
+            Ball_y += BallSpeedMotion_y;
+
+            //When ball is going outside the phone, it bouces it exept if y < 0 then respawn ball.
+            if (Ball_x - Ballradius < 0) { Ball_x = 0 + Ballradius; BallSpeedMotion_x = -BallSpeedMotion_x; }
+            if (Ball_x + Ballradius > c.getWidth()) { Ball_x = c.getWidth() - Ballradius; BallSpeedMotion_x = -BallSpeedMotion_x; }
+            //Ball going past y < 0  
+            if (Ball_y  - Ballradius< 0) {restball();}
+            if (Ball_y + Ballradius > c.getHeight()) { Ball_y = c.getHeight() - Ballradius; BallSpeedMotion_y = -BallSpeedMotion_y; }
         }
 
         //Sets the ball on bottom center of phone
@@ -160,6 +212,15 @@ public class Gameplay extends AppCompatActivity {
             Ball_x = dimensions.x - (dimensions.x /2);
             Ball_y = dimensions.y - (dimensions.x /4);
         }
+        //Resets Ball back to its initial position
+        private void restball()
+        {
+            BallSpeed_x = 0;
+            BallSpeed_y = 0;
+            BallSpeedMotion_x = 0;
+            BallSpeedMotion_y = 0;
+            setBallxy();
+        }
     }
 
     //Simply Draws ball at given location with given radius
@@ -167,9 +228,49 @@ public class Gameplay extends AppCompatActivity {
     {
         Paint p = new Paint();
         p.setColor(Color.BLUE);
-        c.drawCircle(x,y,radius,p);
+
+        c.drawCircle(Ball_x,Ball_y,radius,p);
     }
 
+    //Checks if cordinates are on Ball
+    private boolean isFingerDownOnBall(int eventX, int eventY)
+    {
+        //Wont let the user hold the ball when ball has travelled a certain y cord
+        if(eventY > 1600)
+        {
+            if ((eventX <= (Ball_x + Ballradius + 10) && (eventX > Ball_x - Ballradius + 10)) && (eventY <= (Ball_y + Ballradius + 10) && (eventY > Ball_y - Ballradius + 10))) {
+                FingerDown = true;
+                printToLog("Touch", "Ball is touched");
+                return true;
+            }
+        }
+        printToLog("Touch", "Ball is NOT touched");
+        FingerDown = false;
+        return false;
+    }
+
+    //Method called when Ball Speed is being set when flick gesture is used.
+    private void controlBallMotionSpeed()
+    {
+        if(BallSpeedMotion_x > 80)
+        {
+            BallSpeedMotion_x = 80;
+        }
+        else if(BallSpeedMotion_x < -80)
+        {
+            BallSpeedMotion_x = -80;
+        }
+
+        if(BallSpeedMotion_y > 80)
+        {
+            BallSpeedMotion_y = 80;
+        }
+        else if(BallSpeedMotion_y < -80)
+        {
+            BallSpeedMotion_y = -80;
+        }
+        printToLog("Speed", " Ball Speed : " + BallSpeedMotion_x + ", " + BallSpeed_y);
+    }
     private void printToLog(String tag, String msg)
     {
         Log.e(tag,msg);
