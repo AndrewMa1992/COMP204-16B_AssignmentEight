@@ -116,8 +116,11 @@ public class Gameplay extends AppCompatActivity {
                 }
             }
             for (Can can:Cans){
-                can.Draw(c,p);
-                can.Move(can_dx, c);
+                if(can.isTouching(Ball_x, Ball_y, Ballradius)){
+                    can.hide();
+                }
+                can.draw(c,p);
+                can.move(can_dx, c);
             }
 
             //drawing timer last so its always on top layer
