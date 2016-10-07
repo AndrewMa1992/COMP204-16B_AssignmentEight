@@ -43,6 +43,8 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
     protected int BallSpeed_x, BallSpeed_y = 0;
     protected int BallSpeedMotion_x, BallSpeedMotion_y = 0;
 
+    private int score=0;
+
     //sensor's values will be sored
     protected float sensor_x = 0;
 
@@ -116,9 +118,12 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
 
     }
 
+    protected void addPoint(){ score++; }
+
     protected void endGame(){
         //Launching EndScreen Activity
         Intent intent = new Intent(this, EndScreen.class);
+        intent.putExtra("SCORE", score);
         startActivity(intent);
     }
 
