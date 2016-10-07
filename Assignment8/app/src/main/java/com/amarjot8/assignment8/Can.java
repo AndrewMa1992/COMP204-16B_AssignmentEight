@@ -6,6 +6,7 @@ package com.amarjot8.assignment8;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 
@@ -37,8 +38,10 @@ public class Can{
      * @param p
      */
     public void draw(Canvas c, Paint p){
-        if(visible)
-            c.drawRect(x, y, x+width, y+height, p);
+        if(visible) {
+            p.setColor(Color.BLACK);
+            c.drawRect(x, y, x + width, y + height, p);
+        }
     }
 
     /**

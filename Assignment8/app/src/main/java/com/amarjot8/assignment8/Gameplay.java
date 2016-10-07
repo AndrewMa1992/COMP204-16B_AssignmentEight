@@ -119,6 +119,7 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
     }
 
     protected void addPoint(){ score++; }
+    protected int getScore(){ return score; }
 
     protected void endGame(){
         //Launching EndScreen Activity
@@ -216,15 +217,19 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
             }
             for (Can can:Cans){
                 if(can.isTouching(Ball_x, Ball_y, Ballradius)){
+                    addPoint();
                     can.hide();
                 }
                 can.draw(c,p);
                 can.move(can_dx, c);
             }
 
+            //draws score on top right
+            p.setColor(Color.GREEN);
+            p.setTextSize(200);
+            c.drawText(Integer.toString(getScore()), c.getWidth()-330, 205, p);
             //drawing timer last so its always on top layer
             p.setColor(Color.RED);
-            p.setTextSize(200);
             c.drawText(Long.toString(timer/1000), 10, 205, p);
 
             invalidate();
