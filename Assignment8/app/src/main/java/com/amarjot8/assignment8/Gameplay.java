@@ -129,7 +129,7 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
         sMang = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         acc = sMang.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
-        //Initialized pause dialog
+        //this is the code for the pause dialog
         listView=new ListView(this);
         String[] options={"Home","Restart","Quit","Resume"};
         ArrayAdapter<String> adapter=new ArrayAdapter<String>(this,R.layout.pause_menu,R.id.dialog_options,options);
@@ -142,16 +142,16 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
                 String selected=selected_view.getText().toString();
                 dialog.hide();
                 if(selected.equals("Home")){
-
+                    startActivity(new Intent(Gameplay.this,Home.class));
                 }else if(selected.equals("Restart")){
-
+                    startActivity(new Intent(Gameplay.this,Gameplay.class));
                 }else if(selected.equals("Quit")){
-
+                    endGame();
                 }else if(selected.equals("Resume")){
                     paused=false;
                     dv.invalidate();
                 }else{
-                    printToLog("pause","selected:"+selected.toString()+" and failed");
+                    printToLog("pause","selected:"+selected.toString()+" and option wasn't handled.");
                 }
             }
         });
@@ -329,10 +329,6 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
             dialog = b.create();
         }
         dialog.show();
-    }
-
-    private void cancel(){
-
     }
 
     //Simply Draws ball at given location with given radius
