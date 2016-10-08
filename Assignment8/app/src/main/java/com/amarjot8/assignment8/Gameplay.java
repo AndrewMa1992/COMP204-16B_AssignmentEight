@@ -55,6 +55,7 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
     private int score=0;
     protected boolean paused=false;
     private ListView listView=null;
+    protected AlertDialog dialog=null;
 
     private DrawingView dv;
 
@@ -137,17 +138,20 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ViewGroup viewGroup=(ViewGroup) view;
-                TextView selected=(TextView)viewGroup.findViewById(R.id.dialog_options);
-                if(selected.toString()=="Home"){
+                TextView selected_view=(TextView)viewGroup.findViewById(R.id.dialog_options);
+                String selected=selected_view.getText().toString();
+                dialog.hide();
+                if(selected.equals("Home")){
 
-                }else if(selected.toString()=="Restart"){
+                }else if(selected.equals("Restart")){
 
-                }else if(selected.toString()=="Quit"){
+                }else if(selected.equals("Quit")){
 
-                }else if(selected.toString()=="Resume"){
-
+                }else if(selected.equals("Resume")){
+                    paused=false;
+                    dv.invalidate();
                 }else{
-                    printToLog("pause","User has pressed a pause menu option which is not being handled. Those shouldn't exist.");
+                    printToLog("pause","selected:"+selected.toString()+" and failed");
                 }
             }
         });
@@ -269,17 +273,6 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
 
             if(!paused)
                 invalidate();
-            //Display the pause menu
-            else{
-                AlertDialog.Builder b=new AlertDialog.Builder(Gameplay.this);
-                //add ok button, list of options
-                b.setCancelable(false);
-                b.setPositiveButton("OK",null);
-                b.setView(listView);
-                //create and show dialog
-                AlertDialog dialog=b.create();
-                dialog.show();
-            }
         }
 
         //Makes sure ball cannot go out of screen except from top
@@ -327,8 +320,19 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
 
     @Override
     public void onBackPressed() {
-        paused=!paused;
-        if(!paused) dv.invalidate();
+        paused=true;
+        //if dialog is not yet created, create it.
+        if(dialog==null) {
+            AlertDialog.Builder b = new AlertDialog.Builder(Gameplay.this);
+            b.setCancelable(false);
+            b.setView(listView);
+            dialog = b.create();
+        }
+        dialog.show();
+    }
+
+    private void cancel(){
+
     }
 
     //Simply Draws ball at given location with given radius
