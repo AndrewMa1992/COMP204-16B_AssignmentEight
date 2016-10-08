@@ -21,6 +21,7 @@ import android.text.style.LineBackgroundSpan;
 import android.util.EventLog;
 import android.util.Log;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -44,6 +45,8 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
     protected int BallSpeedMotion_x, BallSpeedMotion_y = 0;
 
     private int score=0;
+    protected boolean paused=false;
+    private DrawingView dv;
 
     //sensor's values will be sored
     protected float sensor_x = 0;
@@ -105,7 +108,7 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         super.onCreate(savedInstanceState);
-        DrawingView dv = new DrawingView(this);
+        dv = new DrawingView(this);
         setContentView(dv);
 
         //Locking View in portait
@@ -232,7 +235,8 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
             p.setColor(Color.RED);
             c.drawText(Long.toString(timer/1000), 10, 205, p);
 
-            invalidate();
+            if(!paused)
+                invalidate();
         }
 
         //Makes sure ball cannot go out of screen except from top
@@ -276,6 +280,12 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
             setBallxy();
             BallMoved = false;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        paused=!paused;
+        if(!paused) dv.invalidate();
     }
 
     //Simply Draws ball at given location with given radius
