@@ -15,16 +15,25 @@ import android.hardware.SensorManager;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.v4.view.VelocityTrackerCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.style.LineBackgroundSpan;
 import android.util.EventLog;
 import android.util.Log;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -44,6 +53,11 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
     protected int BallSpeedMotion_x, BallSpeedMotion_y = 0;
 
     private int score=0;
+    protected boolean paused=false;
+    private ListView listView=null;
+    protected AlertDialog dialog=null;
+
+    private DrawingView dv;
 
     //sensor's values will be sored
     protected float sensor_x = 0;
@@ -105,17 +119,42 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         super.onCreate(savedInstanceState);
-        DrawingView dv = new DrawingView(this);
+        dv = new DrawingView(this);
         setContentView(dv);
 
         //Locking View in portait
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-
         //Used for Accelerometer sensor
         sMang = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         acc = sMang.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
+        //this is the code for the pause dialog
+        listView=new ListView(this);
+        String[] options={"Home","Restart","Quit","Resume"};
+        ArrayAdapter<String> adapter=new ArrayAdapter<String>(this,R.layout.pause_menu,R.id.dialog_options,options);
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ViewGroup viewGroup=(ViewGroup) view;
+                TextView selected_view=(TextView)viewGroup.findViewById(R.id.dialog_options);
+                String selected=selected_view.getText().toString();
+                dialog.hide();
+                if(selected.equals("Home")){
+                    startActivity(new Intent(Gameplay.this,Home.class));
+                }else if(selected.equals("Restart")){
+                    startActivity(new Intent(Gameplay.this,Gameplay.class));
+                }else if(selected.equals("Quit")){
+                    endGame();
+                }else if(selected.equals("Resume")){
+                    paused=false;
+                    dv.invalidate();
+                }else{
+                    printToLog("pause","selected:"+selected.toString()+" and option wasn't handled.");
+                }
+            }
+        });
     }
 
     protected void addPoint(){ score++; }
@@ -232,7 +271,8 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
             p.setColor(Color.RED);
             c.drawText(Long.toString(timer/1000), 10, 205, p);
 
-            invalidate();
+            if(!paused)
+                invalidate();
         }
 
         //Makes sure ball cannot go out of screen except from top
@@ -276,6 +316,19 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
             setBallxy();
             BallMoved = false;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        paused=true;
+        //if dialog is not yet created, create it.
+        if(dialog==null) {
+            AlertDialog.Builder b = new AlertDialog.Builder(Gameplay.this);
+            b.setCancelable(false);
+            b.setView(listView);
+            dialog = b.create();
+        }
+        dialog.show();
     }
 
     //Simply Draws ball at given location with given radius
