@@ -15,6 +15,7 @@ import android.hardware.SensorManager;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.v4.view.VelocityTrackerCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.style.LineBackgroundSpan;
@@ -25,7 +26,14 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,6 +54,8 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
 
     private int score=0;
     protected boolean paused=false;
+    private ListView listView=null;
+
     private DrawingView dv;
 
     //sensor's values will be sored
@@ -114,11 +124,33 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
         //Locking View in portait
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-
         //Used for Accelerometer sensor
         sMang = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         acc = sMang.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
+        //Initialized pause dialog
+        listView=new ListView(this);
+        String[] options={"Home","Restart","Quit","Resume"};
+        ArrayAdapter<String> adapter=new ArrayAdapter<String>(this,R.layout.pause_menu,R.id.dialog_options,options);
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ViewGroup viewGroup=(ViewGroup) view;
+                TextView selected=(TextView)viewGroup.findViewById(R.id.dialog_options);
+                if(selected.toString()=="Home"){
+
+                }else if(selected.toString()=="Restart"){
+
+                }else if(selected.toString()=="Quit"){
+
+                }else if(selected.toString()=="Resume"){
+
+                }else{
+                    printToLog("pause","User has pressed a pause menu option which is not being handled. Those shouldn't exist.");
+                }
+            }
+        });
     }
 
     protected void addPoint(){ score++; }
@@ -237,6 +269,17 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
 
             if(!paused)
                 invalidate();
+            //Display the pause menu
+            else{
+                AlertDialog.Builder b=new AlertDialog.Builder(Gameplay.this);
+                //add ok button, list of options
+                b.setCancelable(false);
+                b.setPositiveButton("OK",null);
+                b.setView(listView);
+                //create and show dialog
+                AlertDialog dialog=b.create();
+                dialog.show();
+            }
         }
 
         //Makes sure ball cannot go out of screen except from top
