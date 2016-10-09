@@ -34,7 +34,7 @@ public class EndScreen extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_end_screen);
 
-        //Lock View to portait
+        //Lock View to portrait
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // Get the score from the previous activity
@@ -45,23 +45,16 @@ public class EndScreen extends AppCompatActivity {
         // Display the score
         ((TextView)findViewById(R.id.textView_score)).setText(score + "");
 
-        // Merge the names and scores lists to be displayed in the ListView
+        // Set the list to display the high scores
         for(int i = 0; i < highScores.length; i++) {
-            listItems.add((i+1) + ". " + names[i] + ": " + highScores[i]);
+            listItems.add(i, (i+1) + ". " + names[i] + ": " + highScores[i]);
         }
 
         // Find position on leaderboard and display it
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listItems);
         ListView listView = (ListView)findViewById(R.id.highScores);
         listView.setAdapter(adapter);
-        if (score >= highScores[9]) {
-            for (int i = 0; i < 9; i++) {
-                if (score >= highScores[i]) {
-
-                    break;
-                }
-            }
-        } else {
+        if (score < highScores[9]) {
             // If the user doesn't make it onto the leaderboard disable submission
             findViewById(R.id.nameInput).setEnabled(false);
             findViewById(R.id.submitScoreButton).setEnabled(false);
@@ -88,14 +81,39 @@ public class EndScreen extends AppCompatActivity {
 
     // Method to be called when the user presses the score submit button
     private void SubmitHighScore() {
-        // For now, just show a toast with the entered name
-        Toast toast = Toast.makeText(getApplicationContext(), ((EditText)findViewById(R.id.nameInput)).getText(), Toast.LENGTH_SHORT);
-        toast.show();
+        if (score >= highScores[9]) {
+            for (int i = 9; i >= 0; i--) {
+                if (score >= highScores[i]) {
+                    if (i != 9) {
+                        highScores[i+1] = highScores[i];
+                        names[i+1] = names[i];
+                    }
+                    highScores[i] = score;
+                    names[i] = ((EditText)findViewById(R.id.nameInput)).getText().toString();
+                }
+                else break;
+            }
+        }
+        // Update the display list
+        updateDisplayList();
+        // Display the changes
+        adapter.notifyDataSetChanged();
+
+        // Disable the TextView and Button
+        findViewById(R.id.nameInput).setEnabled(false);
+        findViewById(R.id.submitScoreButton).setEnabled(false);
     }
 
     // Return to the home activity
     private void startHomeActivity() {
         Intent intent = new Intent(this, Home.class);
         startActivity(intent);
+    }
+
+    private void updateDisplayList() {
+        // Merge the names and scores lists to be displayed in the ListView
+        for(int i = 0; i < highScores.length; i++) {
+            listItems.set(i, (i+1) + ". " + names[i] + ": " + highScores[i]);
+        }
     }
 }
