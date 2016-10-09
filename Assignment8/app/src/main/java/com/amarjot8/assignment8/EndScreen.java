@@ -1,5 +1,6 @@
 package com.amarjot8.assignment8;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
@@ -11,19 +12,19 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.lang.reflect.Array;
+import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class EndScreen extends AppCompatActivity {
     // Placeholder array for high scores, to be written into a file for the beta
-    String[] names = {"One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"};
+    String[] names = {"Placeholder1", "Placeholder2", "Placeholder3", "Placeholder4", "Placeholder5", "Placeholder6", "Placeholder7", "Placeholder8", "Placeholder9", "Placeholder10"};
     int[] highScores = {10, 8, 6, 6, 6, 5, 3, 3, 1, 0};
     ArrayList<String> listItems = new ArrayList<String>();
     ArrayAdapter<String> adapter;
     int score;
+    FileInputStream reader;
+    FileOutputStream writer;
 
 
     @Override
@@ -44,6 +45,22 @@ public class EndScreen extends AppCompatActivity {
 
         // Display the score
         ((TextView)findViewById(R.id.textView_score)).setText(score + "");
+
+        // Read in the high scores from a file
+        try {
+            String line;
+            reader = openFileInput("HighScores");
+            InputStreamReader inputStreamReader = new InputStreamReader(reader);
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            for (int i = 0; i < 10; i++) {
+                line = bufferedReader.readLine();
+                System.err.println(line);
+                names[i] = line.split(" ")[0];
+                highScores[i] = Integer.parseInt(line.split(" ")[1]);
+            }
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
 
         // Set the list to display the high scores
         for(int i = 0; i < highScores.length; i++) {
@@ -102,6 +119,22 @@ public class EndScreen extends AppCompatActivity {
         // Disable the TextView and Button
         findViewById(R.id.nameInput).setEnabled(false);
         findViewById(R.id.submitScoreButton).setEnabled(false);
+
+        // Write to a file
+        try {
+            String line;
+            writer = openFileOutput("HighScores", Context.MODE_PRIVATE);
+
+            // Write the high scores to a file
+            for (int i = 0; i < highScores.length; i++) {
+                line = names[i] + " " + highScores[i];
+                writer.write(line.getBytes());
+                writer.write('\n');
+            }
+            writer.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     // Return to the home activity
