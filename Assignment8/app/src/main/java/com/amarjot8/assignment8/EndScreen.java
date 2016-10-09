@@ -6,14 +6,23 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class EndScreen extends AppCompatActivity {
     // Placeholder array for high scores, to be written into a file for the beta
+    String[] names = {"One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"};
     int[] highScores = {10, 8, 6, 6, 6, 5, 3, 3, 1, 0};
+    ArrayList<String> listItems = new ArrayList<String>();
+    ArrayAdapter<String> adapter;
     int score;
 
 
@@ -36,11 +45,19 @@ public class EndScreen extends AppCompatActivity {
         // Display the score
         ((TextView)findViewById(R.id.textView_score)).setText(score + "");
 
+        // Merge the names and scores lists to be displayed in the ListView
+        for(int i = 0; i < highScores.length; i++) {
+            listItems.add((i+1) + ". " + names[i] + ": " + highScores[i]);
+        }
+
         // Find position on leaderboard and display it
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listItems);
+        ListView listView = (ListView)findViewById(R.id.highScores);
+        listView.setAdapter(adapter);
         if (score >= highScores[9]) {
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 9; i++) {
                 if (score >= highScores[i]) {
-                    ((TextView)findViewById(R.id.textView_position)).setText(i + 1 + "");
+
                     break;
                 }
             }
