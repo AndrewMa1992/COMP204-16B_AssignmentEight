@@ -28,8 +28,11 @@ public class EndScreen extends AppCompatActivity {
         //Lock View to portait
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        // Score not yet implemented, set to 4 as test value
-        score = 4;
+        // Get the score from the previous activity
+        Bundle extras = getIntent().getExtras();
+        if (extras != null)
+            score = extras.getInt("SCORE");
+
         // Display the score
         ((TextView)findViewById(R.id.textView_score)).setText(score + "");
 
@@ -42,8 +45,9 @@ public class EndScreen extends AppCompatActivity {
                 }
             }
         } else {
-            // If the user doesn't make it onto the leaderboard display N/A
-            ((TextView)findViewById(R.id.textView_position)).setText("N/A");
+            // If the user doesn't make it onto the leaderboard disable submission
+            findViewById(R.id.nameInput).setEnabled(false);
+            findViewById(R.id.submitScoreButton).setEnabled(false);
         }
 
         // When the submit button is pressed, submit the name and high score
