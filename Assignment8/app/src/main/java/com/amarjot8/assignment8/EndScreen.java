@@ -3,6 +3,7 @@ package com.amarjot8.assignment8;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -54,7 +55,6 @@ public class EndScreen extends AppCompatActivity {
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
             for (int i = 0; i < 10; i++) {
                 line = bufferedReader.readLine();
-                System.err.println(line);
                 names[i] = line.split(" ")[0];
                 highScores[i] = Integer.parseInt(line.split(" ")[1]);
             }
@@ -95,7 +95,6 @@ public class EndScreen extends AppCompatActivity {
             }
         });
     }
-
     // Method to be called when the user presses the score submit button
     private void SubmitHighScore() {
         if (score >= highScores[9]) {
@@ -104,9 +103,11 @@ public class EndScreen extends AppCompatActivity {
                     if (i != 9) {
                         highScores[i+1] = highScores[i];
                         names[i+1] = names[i];
+                        ((ListView)findViewById(R.id.highScores)).getChildAt(i+1).setBackgroundColor(Color.TRANSPARENT);
                     }
                     highScores[i] = score;
                     names[i] = ((EditText)findViewById(R.id.nameInput)).getText().toString();
+                    ((ListView)findViewById(R.id.highScores)).getChildAt(i).setBackgroundColor(Color.rgb(255,255,153));
                 }
                 else break;
             }
