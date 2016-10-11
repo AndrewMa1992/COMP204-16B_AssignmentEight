@@ -51,6 +51,7 @@
             android:paddingTop="200dp"
             android:textColor="@color/colorPrimaryDark"
             android:layout_width="wrap_content"
+            android:textStyle="bold"
             android:layout_height="wrap_content"
             android:text="Instructions" />
         <TextView
@@ -59,10 +60,15 @@
             android:textColor="@color/colorPrimaryDark"
             android:text="- Swipe Blue ball to hit black cans."/>
         <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorPrimaryDark"
+            android:text="- You can stear the ball by tilting the phone."/>
+        <TextView
             android:textColor="@color/colorPrimaryDark"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="- You have 60 secounds to hit many cans as possible."/>
+            android:text="- 60 secounds to hit many cans as possible.(1 hit = 1 score) "/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
