@@ -7,22 +7,16 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
-import android.graphics.Rect;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.CountDownTimer;
-import android.support.annotation.NonNull;
 import android.support.v4.view.VelocityTrackerCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.style.LineBackgroundSpan;
-import android.util.EventLog;
 import android.util.Log;
 import android.view.Display;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -33,17 +27,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
-//https://developer.android.com/training/gestures/movement.html
 public class Gameplay extends AppCompatActivity implements SensorEventListener {
 
     protected int Ball_x, Ball_y, Ballradius = 100,
