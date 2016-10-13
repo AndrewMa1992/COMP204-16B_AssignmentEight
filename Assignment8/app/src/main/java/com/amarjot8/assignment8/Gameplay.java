@@ -7,22 +7,16 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
-import android.graphics.Rect;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.CountDownTimer;
-import android.support.annotation.NonNull;
 import android.support.v4.view.VelocityTrackerCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.style.LineBackgroundSpan;
-import android.util.EventLog;
 import android.util.Log;
 import android.view.Display;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -33,24 +27,13 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
-//https://developer.android.com/training/gestures/movement.html
 public class Gameplay extends AppCompatActivity implements SensorEventListener {
 
-    protected int Ball_x, Ball_y;
-    protected int Ballradius = 100;
-
-    protected int BallSpeed_x, BallSpeed_y = 0;
-    protected int BallSpeedMotion_x, BallSpeedMotion_y = 0;
+    protected int Ball_x, Ball_y, Ballradius = 100,
+            BallSpeed_x, BallSpeed_y = 0,
+            BallSpeedMotion_x, BallSpeedMotion_y = 0;
 
     private int score=0;
     protected boolean paused=false;
@@ -66,7 +49,6 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
     SensorManager sMang;
     Sensor acc;
 
-    private boolean FingerDown = false;
     private boolean BallMoved = false;
 
     private static final String DEBUG_TAG = "Velocity";
@@ -99,7 +81,7 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
     protected void onPause()
     {
         super.onPause();
-        //Unregistering listner
+        //Un-registering listener
         sMang.unregisterListener(this);
         printToLog("LifeCycle : ", "onPause");
     }
@@ -122,7 +104,7 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
         dv = new DrawingView(this);
         setContentView(dv);
 
-        //Locking View in portait
+        //Locking View in portrait
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         //Used for Accelerometer sensor
@@ -132,7 +114,7 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
         //this is the code for the pause dialog
         listView=new ListView(this);
         String[] options={"Home","Restart","Quit","Resume"};
-        ArrayAdapter<String> adapter=new ArrayAdapter<String>(this,R.layout.pause_menu,R.id.dialog_options,options);
+        ArrayAdapter<String> adapter=new ArrayAdapter<>(this,R.layout.pause_menu,R.id.dialog_options,options);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -141,17 +123,18 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
                 TextView selected_view=(TextView)viewGroup.findViewById(R.id.dialog_options);
                 String selected=selected_view.getText().toString();
                 dialog.hide();
-                if(selected.equals("Home")){
-                    startActivity(new Intent(Gameplay.this,Home.class));
-                }else if(selected.equals("Restart")){
-                    startActivity(new Intent(Gameplay.this,Gameplay.class));
-                }else if(selected.equals("Quit")){
-                    endGame();
-                }else if(selected.equals("Resume")){
-                    paused=false;
-                    dv.invalidate();
-                }else{
-                    printToLog("pause","selected:"+selected.toString()+" and option wasn't handled.");
+                switch (selected) {
+                    case "Home": startActivity(new Intent(Gameplay.this,Home.class));
+                        break;
+                    case "Restart": startActivity(new Intent(Gameplay.this,Gameplay.class));
+                        break;
+                    case "Quit": endGame();
+                        break;
+                    case "Resume": paused=false;
+                        dv.invalidate();
+                        break;
+                    default: printToLog("pause","selected:"+selected+" and option wasn't handled.");
+                        break;
                 }
             }
         });
@@ -216,7 +199,7 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
                         // and getYVelocity() to retrieve the velocity for each pointer ID.
                         mVelocityTracker.computeCurrentVelocity(1000);
                         // Log velocity of pixels per second
-                        //Divided by offsent since velcity is too great for gampeplay
+                        //Divided by offset since velocity is too great for game-play
                         BallSpeedMotion_x =  (int)VelocityTrackerCompat.getXVelocity(mVelocityTracker, pointerId) /40;
                         BallSpeedMotion_y = (int)VelocityTrackerCompat.getYVelocity(mVelocityTracker, pointerId)/40;
                         controlBallMotionSpeed();
@@ -231,12 +214,9 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
             return true;
         }
 
-
-
         @Override
         protected void onDraw(Canvas c)
         {
-
             //timer
             if(System.currentTimeMillis()-last_tick>=tick_period){
                 if (timer<=0)
@@ -284,12 +264,12 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
             //When ball is moving applying phones tilt
             if(BallMoved)
             {
-                //Increasing affect of tilt and correnting distance
+                //Increasing affect of tilt and correcting distance
                 Ball_x += -(sensor_x+sensor_x);
             }
 
-            //When ball is going outside the phone, it bouces it exept if y < 0 then respawn ball.
-            if (Ball_x - Ballradius < 0) { Ball_x = 0 + Ballradius; BallSpeedMotion_x = -BallSpeedMotion_x; }
+            //When ball is going outside the phone, it bounces it except if y < 0 then respawn ball.
+            if (Ball_x - Ballradius < 0) { Ball_x = Ballradius; BallSpeedMotion_x = -BallSpeedMotion_x; }
             if (Ball_x + Ballradius > c.getWidth()) { Ball_x = c.getWidth() - Ballradius; BallSpeedMotion_x = -BallSpeedMotion_x; }
 
             //Ball going past y < 0
@@ -340,20 +320,19 @@ public class Gameplay extends AppCompatActivity implements SensorEventListener {
         c.drawCircle(Ball_x,Ball_y,radius,p);
     }
 
-    //Checks if cordinates are on Ball
+    //Checks if co-ordinates are on Ball
     private boolean isFingerDownOnBall(int eventX, int eventY)
     {
         //Wont let the user hold the ball when ball has travelled a certain y cord
         if(eventY > 1600)
         {
-            if ((eventX <= (Ball_x + Ballradius + 10) && (eventX > Ball_x - Ballradius + 10)) && (eventY <= (Ball_y + Ballradius + 10) && (eventY > Ball_y - Ballradius + 10))) {
-                FingerDown = true;
+            if ((eventX <= (Ball_x + Ballradius + 10) && (eventX > Ball_x - Ballradius + 10)) &&
+                    (eventY <= (Ball_y + Ballradius + 10) && (eventY > Ball_y - Ballradius + 10))){
                 printToLog("Touch", "Ball is touched");
                 return true;
             }
         }
         printToLog("Touch", "Ball is NOT touched");
-        FingerDown = false;
         return false;
     }
 

@@ -4,7 +4,6 @@ package com.amarjot8.assignment8;
  * Created by Joseph on 10/6/2016.
  */
 
-import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -15,7 +14,7 @@ import java.util.Random;
 /**
  * class for can object. Contains all relevent methods and variables
  */
-public class Can{
+class Can{
     private static final int width=100, height=300;
     private int x, y;
     private boolean visible=true;
@@ -28,7 +27,6 @@ public class Can{
      */
     Can(int x_start, Canvas c){
         x=x_start;
-        //added extra brackets in case BEDMAS is not followed
         y=rand.nextInt((c.getHeight()/3)-height);
     }
 
@@ -37,7 +35,7 @@ public class Can{
      * @param c
      * @param p
      */
-    public void draw(Canvas c, Paint p){
+    void draw(Canvas c, Paint p){
         if(visible) {
             p.setColor(Color.BLACK);
             c.drawRect(x, y, x + width, y + height, p);
@@ -51,13 +49,11 @@ public class Can{
      * @param radius
      * @return
      */
-    public boolean isTouching(int circ_x, int circ_y, int radius){
+    boolean isTouching(int circ_x, int circ_y, int radius){
         if(visible) {
             Point[] corners = new Point[]{new Point(x, y), new Point(x + width, y),
                     new Point(x, y + width), new Point(x + width, y + height)};
             for (Point p : corners) {
-                //PLEASE CHECK THIS MATH! I think this should calculate the distance
-                //between the circle and point p, but I'm pretty bad at math :/
                 if (Math.sqrt(Math.pow(circ_x - p.x, 2) + Math.pow(circ_y - p.y, 2)) <= radius)
                     return true;
             }
@@ -69,7 +65,7 @@ public class Can{
      * moves can left by given distance
      * @param dx
      */
-    public void move(int dx, Canvas c){
+    void move(int dx, Canvas c){
         x=x-dx;
         if(offCanvas(c)){
             x = c.getWidth();
@@ -89,5 +85,5 @@ public class Can{
         return false;
     }
 
-    public void hide(){ visible = false; }
+    void hide(){ visible = false; }
 }
